@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorpSSO — FIDO2 Security Key Setup</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dashboard-page">
+    <nav class="dashboard-nav">
+        <div class="nav-brand">
+            <span class="logo-placeholder-small">CorpSSO</span>
+            <span class="nav-title">Security Key Setup</span>
+        </div>
+        <div class="nav-user">
+            <span>{{ user_name }}</span>
+            <a href="{{ url_for('dashboard') }}" class="btn-logout">Dashboard</a>
+        </div>
+    </nav>
+
+    <main class="dashboard-content">
+        <div class="welcome-banner">
+            <h1>FIDO2/WebAuthn Security Key Registration</h1>
+            <p class="extension-notice">
+                <strong>Extension Task:</strong> This feature is a stub for the optional
+                extension task. Students attempting the FIDO2 extension should implement
+                the WebAuthn registration and authentication flow here, demonstrating
+                that the AitM attack fails against origin-bound credentials.
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>Why Security Keys?</h2>
+            <p>
+                FIDO2/WebAuthn security keys bind authentication credentials to the
+                specific origin (domain) of the identity provider. When an attacker
+                proxies the login page through a different domain, the browser refuses
+                to release the credential because the origin does not match. This is
+                why FIDO2 is considered phishing-resistant, while TOTP is not.
+            </p>
+            <p>
+                To implement this extension, you will need to:
+            </p>
+            <ol>
+                <li>Add the <code>py_webauthn</code> library to the Flask application.</li>
+                <li>Implement the registration ceremony at this endpoint.</li>
+                <li>Implement the authentication ceremony as an alternative to TOTP.</li>
+                <li>Demonstrate that Evilginx cannot proxy the WebAuthn challenge.</li>
+            </ol>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,2 @@
+# This directory is populated by the tcpdump container during the lab.
+# PCAP files will appear here when the lab is running.

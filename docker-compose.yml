@@ -1,0 +1,172 @@
+# =============================================================================
+# AitM Lab — Adversary-in-the-Middle Credential Interception and Detection
+# =============================================================================
+# This Docker Compose file creates an isolated lab environment for teaching
+# adversary-in-the-middle (AitM) phishing using Evilginx against a locally
+# hosted mock identity provider.
+#
+# NETWORK: All containers share aitm-lab-net (10.10.10.0/24) with NO internet.
+# USAGE:   docker compose up --build -d
+# TESTS:   docker compose run --rm sigma        (Sigma rules, Task 6)
+# CLEANUP: docker compose --profile tools down -v --rmi local
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # CorpSSO Identity Provider
+  # A Flask application simulating a corporate SSO portal with TOTP MFA.
+  # Accessible directly at https://localhost:8443 for legitimate access.
+  # ---------------------------------------------------------------------------
+  idp:
+    build:
+      context: ./idp
+      dockerfile: Dockerfile
+    container_name: aitm-idp
+    hostname: login.corpsso.local
+    networks:
+      aitm-lab-net:
+        ipv4_address: 10.10.10.2
+      host-bridge: {}
+    ports:
+      - "8443:443"
+    volumes:
+      - idp-data:/app/data
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=lab-secret-key-do-not-use-in-production
+      - SERVER_NAME=login.corpsso.local
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Evilginx3 — Adversary-in-the-Middle Proxy
+  # Runs in developer mode (self-signed certificates).
+  # Admin access via docker compose exec. Phishing port exposed on 443.
+  # ---------------------------------------------------------------------------
+  evilginx:
+    build:
+      context: ./evilginx
+      dockerfile: Dockerfile
+    container_name: aitm-evilginx
+    hostname: evilginx
+    extra_hosts:
+      - "login.corpsso.local:10.10.10.2"
+    networks:
+      aitm-lab-net:
+        ipv4_address: 10.10.10.3
+      host-bridge:
+        ipv4_address: 172.30.0.3
+    # NOTE: Evilginx publishes NO host ports. The lab VM is shared and already
+    # runs a web server on host ports 80/443, so binding them would always
+    # conflict. Instead the browser reaches Evilginx directly on its host-bridge
+    # IP (172.30.0.3) — 443 (phishing), 80 (HTTP redirect) and 3333 (admin API)
+    # are all served on that address. Point login.evil-corpsso.com at 172.30.0.3
+    # in the hosts file. Because nothing is bound on the host, there is no
+    # conflict with whatever already listens on 80/443.
+    volumes:
+      - ./evilginx/phishlets:/app/phishlets:ro
+      - evilginx-data:/root/.evilginx
+    depends_on:
+      - idp
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # MailHog — Mock SMTP/Webmail Server
+  # Web UI at http://localhost:8025, SMTP on port 1025.
+  # Used to deliver phishing lure emails within the lab.
+  # ---------------------------------------------------------------------------
+  mailserver:
+    image: axllent/mailpit:latest
+    container_name: aitm-mailserver
+    hostname: mail.corpsso.local
+    networks:
+      aitm-lab-net:
+        ipv4_address: 10.10.10.4
+      host-bridge: {}
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # tcpdump — Network Traffic Capture
+  # Shares the Evilginx container's network stack, so it records both legs of
+  # the proxied connection: victim -> Evilginx on host-bridge (172.30.0.3) and
+  # Evilginx -> IdP on aitm-lab-net (10.10.10.3 -> 10.10.10.2). A separate
+  # container on the bridge would see little beyond ARP and multicast, because
+  # a bridge delivers unicast frames only to the container they are addressed
+  # to. Traffic that bypasses Evilginx (e.g. a direct sign-in or a token replay
+  # to localhost:8443) is not recorded here; capture on the host for that.
+  # -U flushes each packet to disk, so the PCAP in ./captures/ can be opened
+  # while the capture is still running. One file per container start (no -G
+  # rotation), so the newest file always holds the whole session.
+  # If the evilginx container is restarted or recreated, restart this one too:
+  #   docker compose restart tcpdump
+  # ---------------------------------------------------------------------------
+  tcpdump:
+    image: nicolaka/netshoot:latest
+    container_name: aitm-tcpdump
+    network_mode: "service:evilginx"
+    depends_on:
+      - evilginx
+    volumes:
+      - ./captures:/captures
+    command: >
+      sh -c 'tcpdump -i any -U -Z root
+      -w /captures/aitm-lab-$$(date +%Y%m%d-%H%M%S).pcap'
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Sigma rule tester (Task 6) — a tool, not part of the running lab.
+  # The "tools" profile keeps it out of `docker compose up`. Run it on demand:
+  #   docker compose run --rm sigma
+  # It reads the rules in ./analysis/sigma-rules, the captures in ./captures and
+  # CorpSSO's database (read-only), and needs no network.
+  # ---------------------------------------------------------------------------
+  sigma:
+    build:
+      context: ./analysis/sigma-tester
+    profiles: ["tools"]
+    network_mode: none
+    volumes:
+      - ./analysis:/lab/analysis
+      - ./captures:/lab/captures:ro
+      - idp-data:/lab/idp-data:ro
+
+# =============================================================================
+# Network — Isolated bridge with no internet access
+# =============================================================================
+networks:
+  aitm-lab-net:
+    driver: bridge
+    internal: true  # No external/internet access
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+          gateway: 10.10.10.1
+  host-bridge:
+    driver: bridge  # Non-internal: lets the host reach container IPs directly
+                    # (Evilginx is accessed this way) and lets the IdP/Mailpit
+                    # publish their host ports. A fixed subnet is declared so
+                    # Evilginx can hold a stable IP (172.30.0.3) for the hosts file.
+    ipam:
+      config:
+        # ip_range confines auto-assigned addresses (idp, mailserver) to the
+        # .128-.254 block. Those containers start before Evilginx; without this
+        # they take .2/.3 dynamically and Evilginx then fails to claim its
+        # static .3 with "Address already in use". Keeping the static IP outside
+        # the dynamic range avoids the race entirely.
+        - subnet: 172.30.0.0/24
+          ip_range: 172.30.0.128/25
+          gateway: 172.30.0.1
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  idp-data:
+  evilginx-data:

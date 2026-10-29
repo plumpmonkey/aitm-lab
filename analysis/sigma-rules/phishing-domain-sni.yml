@@ -1,0 +1,75 @@
+# =============================================================================
+# Rule 1: the phishing domain in TLS traffic                    (Task 6, Steps 1-3)
+# =============================================================================
+# This rule works as it is. Test it from the aitm-lab directory with:
+#
+#     docker compose run --rm sigma
+#
+# A Sigma rule has three parts:
+#   1. metadata   - what the rule is, who wrote it, and how serious a match is
+#   2. logsource  - which kind of log the rule runs over
+#   3. detection  - what to look for in that log, and a condition that says
+#                   when to raise an alert
+# Lines starting with # are comments: Sigma ignores them.
+# Indentation matters in YAML. Use spaces, never tabs.
+# =============================================================================
+
+# --- 1. Metadata --------------------------------------------------------------
+title: Connection to the CorpSSO Phishing Domain
+id: f102e9e9-cf1f-47e5-951c-858a8a442afa
+status: test
+description: Detects a TLS connection whose Server Name Indication (SNI) is the phishing domain used against CorpSSO.
+author: Your name
+date: 2026-10-29
+tags:
+    - attack.credential-access
+    - attack.t1557          # MITRE ATT&CK: Adversary-in-the-Middle
+level: high
+falsepositives:
+    - None expected while the rule matches one exact domain.
+
+# --- 2. Log source ------------------------------------------------------------
+# TLS connection logs, in the format Zeek (a network monitor) writes them.
+# The field server_name holds the SNI from each Client Hello: the same value
+# you added as a column in Wireshark in Task 5. The test tool builds this log
+# from your packet capture.
+logsource:
+    product: zeek
+    service: ssl
+
+# --- 3. Detection -------------------------------------------------------------
+# A selection is a named group of tests in the form   field: value
+# A plain value must match the whole field exactly.
+# The condition names the selection(s) that raise an alert.
+detection:
+    selection:
+        server_name: 'login.evil-corpsso.com'
+    condition: selection
+
+# =============================================================================
+# YOUR CHANGE (Task 6, Step 3)
+# =============================================================================
+# This rule catches one exact name, and the attacker can register a new one for
+# the next campaign. Change the detection so that it catches any name that
+# contains "corpsso" but is NOT one of CorpSSO's own names (corpsso.local and
+# anything ending in .corpsso.local).
+#
+# Three pieces of Sigma syntax will help:
+#
+#   * A modifier after the field name changes how the value is compared:
+#         server_name|contains: 'text'     the field contains the text
+#         server_name|endswith: 'text'     the field ends with the text
+#         server_name|startswith: 'text'   the field starts with the text
+#
+#   * A selection can be used to EXCLUDE matches. Give it a name such as
+#     filter_genuine and list the genuine names under it. A dash in front of
+#     each test means "either of these":
+#         filter_genuine:
+#             - server_name: 'first value'
+#             - server_name|endswith: 'second value'
+#
+#   * The condition can combine selections:
+#         condition: selection and not filter_genuine
+#
+# Update the title, description and falsepositives to match your new rule,
+# then run the tests again.

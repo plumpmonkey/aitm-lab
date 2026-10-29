@@ -1,0 +1,26 @@
+# =============================================================================
+# AitM Lab — Hosts File Entries
+# =============================================================================
+# Add the following lines to your system hosts file BEFORE starting the lab.
+# REMOVE THEM AFTER completing the lab cleanup procedure.
+#
+# Location:
+#   Linux / macOS:  /etc/hosts             (edit with sudo)
+#   Windows:        C:\Windows\System32\drivers\etc\hosts  (edit as Administrator)
+#
+# These entries ensure that:
+# 1. The legitimate CorpSSO domain resolves to the IdP container (via localhost)
+# 2. The phishing domain resolves to the Evilginx container (via its Docker IP)
+#
+# The IdP is reached through a localhost port mapping (https://localhost:8443).
+# Evilginx, however, publishes NO host ports — the shared lab VM already runs a
+# web server on host ports 80/443. Instead Evilginx is reached directly on its
+# Docker host-bridge IP (172.30.0.3), which the VM can route to without any
+# host port being bound. In the isolated lab network the containers still
+# communicate using their internal 10.10.10.x addresses.
+# =============================================================================
+
+# === AitM Lab Entries — REMOVE AFTER LAB ===
+127.0.0.1    login.corpsso.local      # Legitimate IdP (host port 8443)
+172.30.0.3   login.evil-corpsso.com   # Evilginx proxy (Docker host-bridge IP)
+# === End AitM Lab Entries ===

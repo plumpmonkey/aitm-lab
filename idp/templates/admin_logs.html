@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorpSSO — Authentication Logs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dashboard-page">
+    <nav class="dashboard-nav">
+        <div class="nav-brand">
+            <span class="logo-placeholder-small">CorpSSO</span>
+            <span class="nav-title">Admin: Authentication Logs</span>
+        </div>
+        <div class="nav-user">
+            <span>{{ user_name }}</span>
+            <a href="{{ url_for('dashboard') }}" class="btn-logout">Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="btn-logout">Sign Out</a>
+        </div>
+    </nav>
+
+    <main class="dashboard-content">
+        <div class="welcome-banner">
+            <h1>Authentication Event Log</h1>
+            <p>Showing the most recent 200 events. <a href="{{ url_for('admin_logs_json') }}">Export as JSON</a></p>
+        </div>
+
+        <div class="log-table-container">
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp (UTC)</th>
+                        <th>Email</th>
+                        <th>Source IP</th>
+                        <th>User Agent</th>
+                        <th>Event Type</th>
+                        <th>Outcome</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr class="log-{{ log.outcome }}">
+                        <td class="timestamp">{{ log.timestamp }}</td>
+                        <td>{{ log.email }}</td>
+                        <td class="ip">{{ log.source_ip }}</td>
+                        <td class="ua">{{ log.user_agent[:60] }}{% if log.user_agent|length > 60 %}...{% endif %}</td>
+                        <td><span class="badge badge-{{ log.event_type }}">{{ log.event_type }}</span></td>
+                        <td><span class="badge badge-{{ log.outcome }}">{{ log.outcome }}</span></td>
+                        <td>{{ log.details or '' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

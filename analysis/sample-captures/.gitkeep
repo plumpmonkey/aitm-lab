@@ -1,0 +1,5 @@
+# Pre-recorded PCAP files for reference.
+# INSTRUCTOR NOTE: Run the lab once yourself, perform the full attack,
+# and copy the resulting PCAP from ./captures/ into this directory.
+# This provides a reference capture for students who encounter issues
+# with their own traffic capture.

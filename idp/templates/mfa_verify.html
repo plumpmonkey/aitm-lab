@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorpSSO — Verify Your Identity</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo-placeholder">CorpSSO</div>
+            <h1>Verify Your Identity</h1>
+            <p class="subtitle">Enter the code from your authenticator app</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="mfa-verify-content">
+            <p class="mfa-instructions">
+                A verification code has been requested for <strong>{{ email }}</strong>.
+                Open your authenticator app and enter the current 6-digit code.
+            </p>
+
+            <form method="POST" action="{{ url_for('mfa_verify') }}" class="login-form">
+                <div class="form-group">
+                    <label for="totp_code">Authentication Code</label>
+                    <input type="text" id="totp_code" name="totp_code"
+                           placeholder="000000" maxlength="6" pattern="[0-9]{6}"
+                           required autofocus autocomplete="off"
+                           style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem;">
+                </div>
+                <button type="submit" class="btn-primary">Verify</button>
+            </form>
+
+            <a href="{{ url_for('login') }}" class="back-link">&larr; Sign in with a different account</a>
+        </div>
+
+        <div class="login-footer">
+            <p>&copy; 2026 CorpSSO Ltd. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

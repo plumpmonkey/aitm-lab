@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorpSSO — Set Up Multi-Factor Authentication</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-page">
+    <div class="login-container mfa-container">
+        <div class="login-header">
+            <div class="logo-placeholder">CorpSSO</div>
+            <h1>Set Up Multi-Factor Authentication</h1>
+            <p class="subtitle">Scan the QR code below with your authenticator app</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="mfa-setup-content">
+            <div class="qr-code-container">
+                <img src="data:image/png;base64,{{ qr_code }}" alt="TOTP QR Code" class="qr-code">
+            </div>
+            <p class="mfa-instructions">
+                Open <strong>Google Authenticator</strong> or <strong>Authy</strong> on your mobile device
+                and scan this QR code. If you cannot scan the code, enter this secret manually:
+            </p>
+            <div class="secret-display">
+                <code>{{ secret }}</code>
+            </div>
+            <p class="mfa-instructions">Account: <strong>{{ email }}</strong></p>
+
+            <form method="POST" action="{{ url_for('mfa_setup') }}" class="login-form">
+                <div class="form-group">
+                    <label for="totp_code">Enter the 6-digit code from your authenticator app</label>
+                    <input type="text" id="totp_code" name="totp_code"
+                           placeholder="000000" maxlength="6" pattern="[0-9]{6}"
+                           required autofocus autocomplete="off"
+                           style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem;">
+                </div>
+                <button type="submit" class="btn-primary">Verify and Complete Setup</button>
+            </form>
+        </div>
+
+        <div class="login-footer">
+            <p>&copy; 2026 CorpSSO Ltd. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

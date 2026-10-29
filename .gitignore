@@ -1,0 +1,36 @@
+# AitM Lab .gitignore
+
+# PCAP captures (generated during lab, potentially large)
+captures/*.pcap
+
+# Evilginx runtime data
+evilginx-ca.crt
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# SQLite databases (generated at runtime)
+idp/data/
+*.db
+
+# Docker
+.docker/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local tooling
+.claude/
+CLAUDE.md
+
+# Instructor-only material (never publish)
+*WITH_ANSWERS*

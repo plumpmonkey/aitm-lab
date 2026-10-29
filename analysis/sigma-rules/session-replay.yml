@@ -1,0 +1,80 @@
+# =============================================================================
+# Rule 2: one session used from more than one address           (Task 6, Step 4)
+# =============================================================================
+# This rule is complete. Test it from the aitm-lab directory with:
+#
+#     docker compose run --rm sigma
+#
+# The tests run it against two logs:
+#   * your own CorpSSO log, from the sign-ins you did in Tasks 2 and 3
+#   * a sample CorpSSO log, from a version of CorpSSO that also records every
+#     use of a session (analysis/sample-data/corpsso-with-session-logging.csv)
+#
+# This file holds TWO rules, separated by the line   ---
+#   Part A picks out the events to look at (an ordinary rule, like Rule 1).
+#   Part B counts across those events: a "correlation" rule.
+# =============================================================================
+
+# --- Part A: the events -------------------------------------------------------
+# Every time CorpSSO creates a session, or (in the sample log) a session is
+# used, with the session_id it belongs to and the source_ip it came from.
+title: CorpSSO Session Events
+id: 4307ad73-1ebd-4c9b-a039-d00bb824f095
+name: corpsso_session_events     # Part B refers to Part A by this name
+status: test
+description: Sessions being created and used at CorpSSO.
+author: Your name
+date: 2026-10-29
+logsource:
+    product: corpsso
+    service: authentication
+detection:
+    selection:
+        event_type:              # a list of values means "any one of these"
+            - 'session_created'
+            - 'session_used'
+        outcome: 'success'
+    condition: selection
+level: informational
+---
+# --- Part B: the correlation --------------------------------------------------
+# Group the Part A events by session_id. Raise an alert when one session is
+# seen from 2 or more different source_ip values within 30 minutes (the life of
+# a CorpSSO session). A stolen cookie is used from the attacker's address, not
+# the address where the session was created, so a replayed session shows up as
+# one session_id with two addresses.
+title: CorpSSO Session Used From More Than One Address
+id: 46bd74fd-b07d-49b2-8fce-a7e950dc7291
+status: test
+description: Detects one CorpSSO session seen from more than one source IP address within 30 minutes, a sign that a stolen session cookie has been replayed.
+author: Your name
+date: 2026-10-29
+tags:
+    - attack.credential-access
+    - attack.t1539          # MITRE ATT&CK: Steal Web Session Cookie
+    - attack.lateral-movement
+    - attack.t1550.004      # MITRE ATT&CK: Use Alternate Authentication Material: Web Session Cookie
+correlation:
+    type: value_count            # count the different values of a field
+    rules:
+        - corpsso_session_events
+    group-by:
+        - session_id             # one count per session
+    timespan: 30m                # within this window
+    condition:
+        field: source_ip         # the field whose different values are counted
+        gte: 2                   # alert when there are 2 or more
+falsepositives:
+    - A user whose address changes during a session, for example moving from office Wi-Fi to mobile data.
+level: high
+
+# =============================================================================
+# TRY THIS (Task 6, Step 4)
+# =============================================================================
+# Change ONE setting in Part B, run the tests, and note what changes. Then put
+# it back before you try the next. For example:
+#     timespan: 5m                   (instead of 30m)
+#     field: user_agent              (instead of source_ip)
+#     group-by:
+#         - email                    (instead of session_id)
+# Keep the indentation exactly as it is in the rule above.

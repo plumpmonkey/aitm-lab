@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorpSSO — Employee Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dashboard-page">
+    <nav class="dashboard-nav">
+        <div class="nav-brand">
+            <span class="logo-placeholder-small">CorpSSO</span>
+            <span class="nav-title">Employee Portal</span>
+        </div>
+        <div class="nav-user">
+            <span>{{ user_name }}</span>
+            <a href="{{ url_for('logout') }}" class="btn-logout">Sign Out</a>
+        </div>
+    </nav>
+
+    <main class="dashboard-content">
+        <div class="welcome-banner">
+            <h1>Welcome back, {{ user_name }}</h1>
+            <p>You are securely authenticated via CorpSSO.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2>Profile</h2>
+                <dl class="profile-details">
+                    <dt>Name</dt>
+                    <dd>{{ user_name }}</dd>
+                    <dt>Email</dt>
+                    <dd>{{ user_email }}</dd>
+                    <dt>Department</dt>
+                    <dd>{{ user_department }}</dd>
+                    <dt>MFA Status</dt>
+                    <dd><span class="badge badge-success">Enabled (TOTP)</span></dd>
+                </dl>
+            </div>
+
+            <div class="card">
+                <h2>Recent Activity</h2>
+                <ul class="activity-list">
+                    <li>Logged in from {{ request.remote_addr }} just now</li>
+                    <li>Password last changed 14 days ago</li>
+                    <li>MFA enrolled on initial setup</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>Quick Links</h2>
+                <ul class="quick-links">
+                    <li><a href="#">Company Intranet</a></li>
+                    <li><a href="#">HR Self-Service</a></li>
+                    <li><a href="#">IT Support Desk</a></li>
+                    <li><a href="{{ url_for('webauthn_setup') }}">Set Up Security Key (FIDO2)</a></li>
+                </ul>
+            </div>
+
+            <div class="card card-notice">
+                <h2>Security Notice</h2>
+                <p>
+                    Always verify you are on <strong>login.corpsso.local</strong> before
+                    entering your credentials. Report suspicious emails to
+                    <a href="mailto:security@corpsso.local">security@corpsso.local</a>.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="dashboard-footer">
+        <p>&copy; 2026 CorpSSO Ltd. Internal use only.</p>
+    </footer>
+</body>
+</html>

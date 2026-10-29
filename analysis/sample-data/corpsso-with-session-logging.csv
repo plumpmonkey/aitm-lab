@@ -1,0 +1,31 @@
+timestamp,email,source_ip,user_agent,event_type,outcome,session_id,details
+2026-10-12T08:58:10.000000+00:00,bob.jones@corpsso.local,192.0.2.20,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,login_attempt,success,,Credentials valid
+2026-10-12T08:58:24.000000+00:00,bob.jones@corpsso.local,192.0.2.20,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,mfa_challenge,presented,,TOTP challenge sent
+2026-10-12T08:58:31.000000+00:00,bob.jones@corpsso.local,192.0.2.20,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,mfa_verify,success,,TOTP verified
+2026-10-12T08:58:31.000000+00:00,bob.jones@corpsso.local,192.0.2.20,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,session_created,success,5b0e21c4d9a7f318,Session issued
+2026-10-12T09:02:44.000000+00:00,bob.jones@corpsso.local,192.0.2.20,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,session_used,success,5b0e21c4d9a7f318,GET /dashboard
+2026-10-12T09:15:03.000000+00:00,bob.jones@corpsso.local,192.0.2.20,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,session_used,success,5b0e21c4d9a7f318,GET /profile
+2026-10-12T09:27:51.000000+00:00,bob.jones@corpsso.local,192.0.2.20,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,session_used,success,5b0e21c4d9a7f318,GET /dashboard
+2026-10-12T09:40:02.000000+00:00,carol.white@corpsso.local,192.0.2.31,"Mozilla/5.0 (Macintosh; Intel Mac OS X 14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",login_attempt,success,,Credentials valid
+2026-10-12T09:40:16.000000+00:00,carol.white@corpsso.local,192.0.2.31,"Mozilla/5.0 (Macintosh; Intel Mac OS X 14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",mfa_challenge,presented,,TOTP challenge sent
+2026-10-12T09:40:23.000000+00:00,carol.white@corpsso.local,192.0.2.31,"Mozilla/5.0 (Macintosh; Intel Mac OS X 14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",mfa_verify,success,,TOTP verified
+2026-10-12T09:40:23.000000+00:00,carol.white@corpsso.local,192.0.2.31,"Mozilla/5.0 (Macintosh; Intel Mac OS X 14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",session_created,success,c4a7e90b13d25f66,Session issued
+2026-10-12T09:41:10.000000+00:00,carol.white@corpsso.local,192.0.2.31,"Mozilla/5.0 (Macintosh; Intel Mac OS X 14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",session_used,success,c4a7e90b13d25f66,GET /dashboard
+2026-10-12T09:52:37.000000+00:00,carol.white@corpsso.local,198.51.100.77,"Mozilla/5.0 (Macintosh; Intel Mac OS X 14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",session_used,success,c4a7e90b13d25f66,GET /dashboard
+2026-10-12T09:55:12.000000+00:00,carol.white@corpsso.local,198.51.100.77,"Mozilla/5.0 (Macintosh; Intel Mac OS X 14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",session_used,success,c4a7e90b13d25f66,GET /profile
+2026-10-12T10:14:05.000000+00:00,alice.smith@corpsso.local,203.0.113.50,Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0,login_attempt,success,,Credentials valid
+2026-10-12T10:14:19.000000+00:00,alice.smith@corpsso.local,203.0.113.50,Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0,mfa_challenge,presented,,TOTP challenge sent
+2026-10-12T10:14:26.000000+00:00,alice.smith@corpsso.local,203.0.113.50,Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0,mfa_verify,success,,TOTP verified
+2026-10-12T10:14:26.000000+00:00,alice.smith@corpsso.local,203.0.113.50,Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0,session_created,success,a1f93c07e6b24d58,Session issued
+2026-10-12T10:18:40.000000+00:00,alice.smith@corpsso.local,198.51.100.200,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",session_used,success,a1f93c07e6b24d58,GET /dashboard
+2026-10-12T10:19:02.000000+00:00,alice.smith@corpsso.local,198.51.100.200,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",session_used,success,a1f93c07e6b24d58,GET /profile
+2026-10-12T11:00:30.000000+00:00,dave.patel@corpsso.local,192.0.2.44,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,login_attempt,success,,Credentials valid
+2026-10-12T11:00:44.000000+00:00,dave.patel@corpsso.local,192.0.2.44,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,mfa_challenge,presented,,TOTP challenge sent
+2026-10-12T11:00:51.000000+00:00,dave.patel@corpsso.local,192.0.2.44,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,mfa_verify,success,,TOTP verified
+2026-10-12T11:00:51.000000+00:00,dave.patel@corpsso.local,192.0.2.44,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,session_created,success,d7e2b5419f0c3a81,Session issued
+2026-10-12T11:04:12.000000+00:00,dave.patel@corpsso.local,192.0.2.44,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,session_used,success,d7e2b5419f0c3a81,GET /dashboard
+2026-10-12T11:21:15.000000+00:00,dave.patel@corpsso.local,198.51.100.15,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,login_attempt,success,,Credentials valid
+2026-10-12T11:21:29.000000+00:00,dave.patel@corpsso.local,198.51.100.15,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,mfa_challenge,presented,,TOTP challenge sent
+2026-10-12T11:21:36.000000+00:00,dave.patel@corpsso.local,198.51.100.15,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,mfa_verify,success,,TOTP verified
+2026-10-12T11:21:36.000000+00:00,dave.patel@corpsso.local,198.51.100.15,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,session_created,success,d7e2c8a03b6f1e94,Session issued
+2026-10-12T11:23:40.000000+00:00,dave.patel@corpsso.local,198.51.100.15,Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:155.0) Gecko/20100101 Firefox/155.0,session_used,success,d7e2c8a03b6f1e94,GET /dashboard
